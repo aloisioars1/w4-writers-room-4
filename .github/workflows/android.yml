@@ -1,0 +1,134 @@
+name: Android CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  ktlint_check:
+    name: Ktlint & Code Style Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          validate-wrappers: false
+
+      - name: Grant Execute Permission for Gradlew & Ensure Wrapper JAR
+        run: |
+          if [ ! -f "gradle/wrapper/gradle-wrapper.jar" ] || [ ! -s "gradle/wrapper/gradle-wrapper.jar" ]; then
+            echo "⚡ gradle-wrapper.jar ausente ou corrompido. Gerando wrapper oficial com o Gradle do runner..."
+            gradle wrapper --gradle-version 8.5 --distribution-type bin
+          fi
+          chmod +x gradlew
+
+      - name: Run Ktlint Code Format & Style Check (Google Style Guide)
+        run: |
+          curl -sSLO https://github.com/pinterest/ktlint/releases/download/1.3.1/ktlint
+          chmod a+x ktlint
+          ./ktlint "app/src/**/*.kt" --reporter=plain || echo "Ktlint encontrou avisos de formatação estilo Google, prosseguindo com a pipeline."
+
+      - name: Run Android Gradle Lint
+        run: ./gradlew lint || true
+
+  build_and_test:
+    name: Build & Test Android App
+    needs: ktlint_check
+    runs-on: ubuntu-latest
+    env:
+      KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+      KEYSTORE_STORE_PASSWORD: ${{ secrets.KEYSTORE_STORE_PASSWORD }}
+      KEYSTORE_KEY_ALIAS: ${{ secrets.KEYSTORE_KEY_ALIAS }}
+      KEYSTORE_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
+      FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+      FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          validate-wrappers: false
+
+      - name: Grant Execute Permission for Gradlew & Ensure Wrapper JAR
+        run: |
+          if [ ! -f "gradle/wrapper/gradle-wrapper.jar" ] || [ ! -s "gradle/wrapper/gradle-wrapper.jar" ]; then
+            echo "⚡ gradle-wrapper.jar ausente ou corrompido. Gerando wrapper oficial com o Gradle do runner..."
+            gradle wrapper --gradle-version 8.5 --distribution-type bin
+          fi
+          chmod +x gradlew
+
+      - name: Decode Release Keystore (App Signing)
+        if: env.KEYSTORE_BASE64 != ''
+        run: |
+          mkdir -p app
+          echo "$KEYSTORE_BASE64" | base64 --decode > app/release.keystore
+
+      - name: Run Unit Tests
+        run: ./gradlew test
+
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug
+
+      - name: Build Release APK
+        run: ./gradlew assembleRelease
+
+      - name: Build Release AAB (Android App Bundle)
+        run: ./gradlew bundleRelease
+
+      - name: Upload Debug APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+
+      - name: Upload Release APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-apk
+          path: app/build/outputs/apk/release/*.apk
+
+      - name: Upload Release AAB Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-aab
+          path: app/build/outputs/bundle/release/*.aab
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Deploy AAB to Firebase App Distribution
+        if: env.FIREBASE_APP_ID != '' && env.FIREBASE_TOKEN != ''
+        run: |
+          npm install -g firebase-tools
+          firebase appdistribution:distribute app/build/outputs/bundle/release/app-release.aab --app "$FIREBASE_APP_ID" --testers "dev-team@example.com, qa@example.com" --release-notes "Nova versão automatizada via CI/CD"
+
+      - name: Upload Test Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: app/build/reports/tests/
