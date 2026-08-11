@@ -18,12 +18,6 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    buildCache {
-        local {
-            enabled = true
-        }
-    }
-
     signingConfigs {
         release {
             def ksFile = file("release.keystore").exists() ? file("release.keystore") : (file("app/release.keystore").exists() ? file("app/release.keystore") : null)
