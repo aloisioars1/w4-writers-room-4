@@ -37,17 +37,13 @@ jobs:
       - name: Grant Execute Permission for Gradlew & Ensure Wrapper JAR
         run: |
           chmod +x gradlew
-          echo "Verificando integridade do wrapper..."
+          echo "Apagando JAR possivelmente corrompido..."
+          rm -f gradle/wrapper/gradle-wrapper.jar
+          echo "Gerando wrapper oficial com Gradle 8.6..."
+          gradle wrapper --gradle-version 8.6 --no-daemon
+          echo "Verificando..."
           ls -lh gradle/wrapper/
-          # Se o JAR não for um ZIP válido ou não tiver a Main, baixa o oficial
-          if ! unzip -t gradle/wrapper/gradle-wrapper.jar > /dev/null 2>&1 || ! jar tf gradle/wrapper/gradle-wrapper.jar | grep -q "GradleWrapperMain"; then
-            echo "⚠️ JAR corrompido ou inválido detectado! Baixando oficial 8.6..."
-            rm -f gradle/wrapper/gradle-wrapper.jar
-            curl -L -o gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/v8.6.0/gradle/wrapper/gradle-wrapper.jar
-            echo "✅ JAR oficial baixado: $(ls -lh gradle/wrapper/gradle-wrapper.jar)"
-          else
-            echo "✅ JAR íntegro: $(ls -lh gradle/wrapper/gradle-wrapper.jar)"
-          fi
+          jar tf gradle/wrapper/gradle-wrapper.jar | grep GradleWrapperMain && echo "✅ JAR 100% VÁLIDO"
 
       - name: Decode Release Keystore (App Signing)
         if: ${{ env.KEYSTORE_BASE64 != '' }}
