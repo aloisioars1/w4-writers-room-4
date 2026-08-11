@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="white">#FFFFFFFF</color>
+    <color name="black">#FF000000</color>
+    <color name="dark_bg">#FF020617</color>
+    <color name="light_bg">#FFF8FAFC</color>
+    <color name="header_bg_dark">#FF0F172A</color>
+    <color name="header_bg_light">#FFFFFFFF</color>
+    <color name="text_primary_dark">#FFF8FAFC</color>
+    <color name="text_primary_light">#FF1E293B</color>
+    <color name="text_secondary_dark">#FF94A3B8</color>
+    <color name="text_secondary_light">#FF64748B</color>
+    
+    <!-- Cores de Chat Refatoradas -->
+    <color name="chat_bubble_user_dark">#f59e0b</color>
+    <color name="chat_bubble_user_light">#f59e0b</color>
+    <color name="chat_text_user">#FFFFFFFF</color>
+    <color name="chat_sender_user">#CCFFFFFF</color>
+
+    <color name="chat_bubble_ai_dark">#FF1E293B</color>
+    <color name="chat_bubble_ai_light">#FFFFFFFF</color>
+    <color name="chat_text_ai_dark">#FFCBD5E1</color>
+    <color name="chat_text_ai_light">#FF334155</color>
+    <color name="chat_sender_ai_dark">#FF64748B</color>
+    <color name="chat_sender_ai_light">#FF94A3B8</color>
+
+    <color name="input_bg_dark">#FF020617</color>
+    <color name="input_bg_light">#FFFFFFFF</color>
+    <color name="input_stroke_dark">#FF1E293B</color>
+    <color name="input_stroke_light">#FFE2E8F0</color>
+    <color name="input_area_bg_dark">#FF0F172A</color>
+    <color name="input_area_bg_light">#FFF1F5F9</color>
+    <color name="send_button_tint">#f59e0b</color>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+</resources>
