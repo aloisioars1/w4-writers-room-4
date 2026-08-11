@@ -31,7 +31,7 @@ jobs:
         run: |
           if [ ! -f "gradle/wrapper/gradle-wrapper.jar" ] || [ ! -s "gradle/wrapper/gradle-wrapper.jar" ]; then
             echo "⚡ gradle-wrapper.jar ausente ou corrompido. Gerando wrapper oficial com o Gradle do runner..."
-            gradle wrapper --gradle-version 8.5 --distribution-type bin
+            gradle wrapper --gradle-version 8.6 --distribution-type bin
           fi
           chmod +x gradlew
 
@@ -75,7 +75,7 @@ jobs:
         run: |
           if [ ! -f "gradle/wrapper/gradle-wrapper.jar" ] || [ ! -s "gradle/wrapper/gradle-wrapper.jar" ]; then
             echo "⚡ gradle-wrapper.jar ausente ou corrompido. Gerando wrapper oficial com o Gradle do runner..."
-            gradle wrapper --gradle-version 8.5 --distribution-type bin
+            gradle wrapper --gradle-version 8.6 --distribution-type bin
           fi
           chmod +x gradlew
 
