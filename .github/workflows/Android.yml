@@ -22,7 +22,7 @@ jobs:
         run: |
           echo "sdk.dir=$ANDROID_HOME" > local.properties
           if [ -f ".env.example" ] && [ ! -f ".env" ]; then cp .env.example .env; fi
-          PACKAGE=$(grep -oP 'applicationId = "K[^"]+' app/build.gradle.kts | head -1)
+          PACKAGE=$(grep -oP 'applicationId = "\K[^"]+' app/build.gradle.kts | head -1)
           mkdir -p app
           cat > app/google-services.json <<EOF
           {
@@ -39,7 +39,7 @@ jobs:
       - name: Forçar wrapper 9.3.1
         run: |
           if [ ! -f "./gradlew" ]; then gradle wrapper --gradle-version 9.3.1; fi
-          sed -i 's|distributionUrl=.*|distributionUrl=https\://services.gradle.org/distributions/gradle-9.3.1-bin.zip|' gradle/wrapper/gradle-wrapper.properties
+          sed -i 's|distributionUrl=.*|distributionUrl=https\\://services.gradle.org/distributions/gradle-9.3.1-bin.zip|' gradle/wrapper/gradle-wrapper.properties
           chmod +x ./gradlew
       - run: ./gradlew assembleDebug --stacktrace
       - uses: actions/upload-artifact@v4
