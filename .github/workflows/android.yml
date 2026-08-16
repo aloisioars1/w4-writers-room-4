@@ -33,7 +33,7 @@ jobs:
           EOF
           if [ ! -f "debug.keystore" ]; then keytool -genkey -v -keystore debug.keystore -alias androiddebugkey -storepass android -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Debug" -noprompt; fi
           if [ ! -f "my-upload-key.jks" ]; then keytool -genkey -v -keystore my-upload-key.jks -alias upload -storepass android123 -keypass android123 -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Upload" -noprompt; fi
-      - uses: gradle/actions/setup-gradle@v3
+      - uses: gradle/actions/setup-gradle@v6
         with:
           gradle-version: 9.3.1
       - name: Forçar wrapper 9.3.1
